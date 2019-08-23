@@ -1,0 +1,68 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.window{
+    width: 259px;
+    height: 194px;
+    margin: 20px auto;
+    overflow: hidden;
+}
+.images{
+    display: flex;
+    position: relative;
+}
+.images > img{
+    width: 100%;
+    transition: all .3s;
+    top: 0;
+    position: absolute;
+}
+/*具体思维实现css代码*/
+/*
+.images > img:nth-child(1){
+    position: absolute;
+    left: 0;    
+    top: 0;
+}
+.images > img:nth-child(2){
+    position: absolute;
+    top: 0;
+    left: 100%;
+}
+.images > img:nth-child(3){
+    position: absolute;
+    top: 0;
+    left: 100%;
+}
+}
+.images > img:nth-child(4){
+    position: absolute;
+}
+.images > img:nth-child(5){
+    position: absolute;
+}
+
+
+//第二轮：自觉回到原来位置
+.images > img.right{
+    top: 0;
+    left: 100%;
+}
+
+*/
+
+/*抽象思维实现css代码*/
+.images > img.current{
+    left: 0;
+    transform: translateX(0);
+    z-index: 1;
+}
+.images > img.leave{
+    transform: translateX(-100%);
+    z-index: 1;
+}
+.images > img.enter{
+    transform: translateX(100%);
+}
