@@ -1,24 +1,28 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-.window{
+
+.window {
     width: 259px;
     height: 194px;
     margin: 20px auto;
     overflow: hidden;
 }
-.images{
+
+.images {
     display: flex;
     position: relative;
 }
-.images > img{
+
+.images>img {
     width: 100%;
     transition: all .3s;
     top: 0;
     position: absolute;
 }
+
 /*具体思维实现css代码*/
 /*
 .images > img:nth-child(1){
@@ -54,15 +58,17 @@
 */
 
 /*抽象思维实现css代码*/
-.images > img.current{
+.images>img.current {
     left: 0;
     transform: translateX(0);
     z-index: 1;
 }
-.images > img.leave{
+
+.images>img.leave {
     transform: translateX(-100%);
     z-index: 1;
 }
-.images > img.enter{
+
+.images>img.enter {
     transform: translateX(100%);
 }
