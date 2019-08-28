@@ -53,14 +53,30 @@ setTimeout(function(){
 let n
 初始化()
 
-setInterval(() => {
+let timer = setInterval(() => {
     makeLeave(getImage(n)) //makeLeave的返回值是undefined
         .one('transitionend', (e) => { //transitionend就是指动画结束以后马上添加其它函数,`xxx(${n})`采用ES6的插值法，n多少那么这一部分就是多少
-            makeEnter($(e.currentTarget))   //给当前元素添加enter状态
+            makeEnter($(e.currentTarget)) //给当前元素添加enter状态
         })
     makeCurrent(getImage(n + 1))
     n += 1
 }, 2000)
+document.addEventListener('visibilitychange', function (e) {
+    if (document.hidden) {
+        wimdow.clearInterval(timer)
+    } else {
+         timer = setInterval(() => {
+            makeLeave(getImage(n)) //makeLeave的返回值是undefined
+                .one('transitionend', (e) => { //transitionend就是指动画结束以后马上添加其它函数,`xxx(${n})`采用ES6的插值法，n多少那么这一部分就是多少
+                    makeEnter($(e.currentTarget)) //给当前元素添加enter状态
+                })
+            makeCurrent(getImage(n + 1))
+            n += 1
+        }, 2000)
+    }
+})
+
+
 
 //下面的代码都是封装之后的函数，可以不用看
 function getImage(n) {
@@ -77,10 +93,10 @@ function x(n) {
     }
     return n
 }
- 
+
 //初始化就是让n=1,让第一个变成current，其他的变成enter
 function 初始化() {
-    n = 1               
+    n = 1
     //初始化三个图片
     $(`.images > img:nth-child(${n}`).addClass('current')
         .siblings().addClass('enter')
