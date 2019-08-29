@@ -10,16 +10,30 @@
 </head>
 
 <body>
-    <div class="window">
-        <div class="images">
-            <img alt="图片" width=259 height=194 src="./images/1.jpg">
-            <img alt="图片" width=259 height=300 src="./images/2.jpg">
-            <img alt="图片" width=259 height=300 src="./images/3.jpg">
+    <div class="container">
+        <div class="window">
+            <div class="images" id="slides">
+                <img alt="图片" width=259 height=194 src="./images/1.jpg">
+                <img alt="图片" width=259 height=300 src="./images/2.jpg">
+                <img alt="图片" width=259 height=300 src="./images/3.jpg">
+            </div>
         </div>
+        <div id="controls" style="text-align: center">
+            <button id="previous">上一张</button>
+            <button id="next">下一张</button>
+        </div>
+        <div style="text-align: center" id="buttonWrapper">
+            <button>第1张</button>
+            <button>第2张</button>
+            <button>第3张</button>
+        </div>
+
     </div>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="./main.js"></script>
+
+
 </body>
 
 </html>

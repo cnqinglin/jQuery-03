@@ -1,140 +1,88 @@
-/*具体思维实现
-
-//第一轮：同时给第一二图片添加动画
-setTimeout(function(){
-    $('.images>img:nth-child(1)').css({
-        transform:'translate(-100%)'
-    })
-    $('.images>img:nth-child(2)').css({
-        transform:'translate(-100%)'
-    })
-    $('.images>img:nth-child(1)').one('transitionend',function(e){  //one只执行一次
-        $(e.currentTarget).addClass('right').css({transform:'none'})
-    })
-},3000)
-setTimeout(function(){
-    $('.images>img:nth-child(2)').css({
-        transform:'translate(-200%)'
-    })
-    $('.images>img:nth-child(3)').css({
-        transform:'translate(-100%)'
-    })
-    $('.images>img:nth-child(2)').one('transitionend',function(e){
-        $(e.currentTarget).addClass('right').css({transform:'none'})
-    })
-},6000)
-//第二轮
-setTimeout(function(){
-    $('.images>img:nth-child(3)').css({
-        transform:'translate(-200%)'
-    })
-    $('.images>img:nth-child(1)').css({
-        transform:'translate(-100%)'
-    })
-    $('.images>img:nth-child(3)').one('transitionend',function(e){
-        $(e.currentTarget).addClass('right').css({transform:'none'})
-    })
-},9000)
-setTimeout(function(){
-    $('.images>img:nth-child(1)').css({
-        transform:'translate(-200%)'
-    })
-    $('.images>img:nth-child(2)').css({
-        transform:'translate(-100%)'
-    })
-    $('.images>img:nth-child(1)').one('transitionend',function(e){  //one只执行一次
-        $(e.currentTarget).addClass('right').css({transform:'none'})
-    })
-},12000)
-*/
+//最后优化代码-实现无缝轮播，每一个页面之间可随意切换，页面不看情况下不轮播
+let $buttons = $('#buttonWrapper > button')
+let $slides = $('#slides')
+let $images = $slides.children('img')
+let current = 0
 
 
-//抽象思维实现
-let n
-初始化()
 
-let timer = setInterval(() => {
-    makeLeave(getImage(n)) //makeLeave的返回值是undefined
-        .one('transitionend', (e) => { //transitionend就是指动画结束以后马上添加其它函数,`xxx(${n})`采用ES6的插值法，n多少那么这一部分就是多少
-            makeEnter($(e.currentTarget)) //给当前元素添加enter状态
-        })
-    makeCurrent(getImage(n + 1))
-    n += 1
-}, 2000)
-document.addEventListener('visibilitychange', function (e) {
-    if (document.hidden) {
-        wimdow.clearInterval(timer)
-    } else {
-         timer = setInterval(() => {
-            makeLeave(getImage(n)) //makeLeave的返回值是undefined
-                .one('transitionend', (e) => { //transitionend就是指动画结束以后马上添加其它函数,`xxx(${n})`采用ES6的插值法，n多少那么这一部分就是多少
-                    makeEnter($(e.currentTarget)) //给当前元素添加enter状态
-                })
-            makeCurrent(getImage(n + 1))
-            n += 1
-        }, 2000)
-    }
+makeFakeSlides()
+$slides.css({transform: 'translateX(-259px)'})
+bindEvents()
+$('#next').on('click',function(){
+    goToSlide(current+1)
+})
+$('#previous').on('click',function(){
+    goToSlide(current-1)
+})
+var timerId = setInterval(function(){
+    goToSlide(current + 1)
+},2000)
+$('.container').on('mouseenter',function(){
+    window.clearInterval(timerId)
+}).on('mouseleave',function(){
+    timerId = setInterval(function(){
+        goToSlide(current + 1)
+    },2000)
 })
 
-
-
-//下面的代码都是封装之后的函数，可以不用看
-function getImage(n) {
-    return $(`.images > img:nth-child(${x(n)})`)
+function bindEvents() {
+    //事件委托
+    $('#buttonWrapper').on('click', 'button', function (e) {
+        let $button = $(e.currentTarget)
+        let index = $button.index() //知道这个按钮是第几个
+        goToSlide(index)
+    })
 }
 
-function x(n) {
-    if (n > 3) {
-        n = n % 3
-        if (n === 0) {
-            n = 3
-            //n = 1,2,3
-        }
+//重要—— 做到直接到达某一个slide的效果
+function goToSlide(index) {
+    if(index > $buttons.length - 1){
+        index = 0
+    }else if(index < 0){
+        index = $buttons.length - 1
     }
-    return n
+    //如果是从最后一个到第一张
+    if (current === $buttons.length - 1 && index === 0) {
+        console.log('here')
+        $slides.css({
+                transform: `translateX(${-($buttons.length + 1)*259}px)`
+            })
+            .one('transitionend', function () {
+                $slides.hide()
+                    .offset() //返回对象,后面加对象，先隐藏再显示时要用到这个
+                $slides.css({
+                        transform: `translateX(${-(index+1)*259}px)`
+                    })
+                    .show()
+            })
+    } else if (current === 0 && index === $buttons.length - 1) {
+        console.log(2)
+        //从第一张回到最后一张
+        $slides.css({
+                transform: `translateX(0px)`
+            })
+            .one('transitionend', function () {
+                $slides.hide()
+                    .offset() //返回对象,后面加对象
+                $slides.css({
+                        transform: `translateX(${-(index+1)*259}px)`
+                    })
+                    .show()
+            })
+    } else {
+        console.log(3)
+        $slides.css({
+            transform: `translateX(${-(index+1)*259 }px)`
+        })
+    }
+    current = index
 }
 
-//初始化就是让n=1,让第一个变成current，其他的变成enter
-function 初始化() {
-    n = 1
-    //初始化三个图片
-    $(`.images > img:nth-child(${n}`).addClass('current')
-        .siblings().addClass('enter')
+function makeFakeSlides() {
+    //复制第一个
+    let $firstCopy = $images.eq(0).clone(true) //参数true就是子元素也要克隆；$images.eq表示所有图片
+    let $lastCopy = $images.eq($images.length - 1).clone(true)
+    $slides.append($firstCopy) //第一个复制到最后
+    $slides.prepend($lastCopy) //把最后一个复制到第一个
 }
-
-function makeCurrent($node) {
-    return $node.removeClass("enter leave").addClass("current")
-}
-
-function makeEnter($node) {
-    return $node.removeClass("current leave").addClass("enter")
-}
-
-function makeLeave($node) {
-    $node.removeClass("enter current").addClass("leave")
-    return $node //防止返回 undefined,操作一番，传入什么就传出什么
-}
-
-//找规律
-/*
-setTimeout(()=>{
-    $('.images > img:nth-child(2)').removeClass('current').addClass('leave').one('transitionend',(e)=>{  //transitionend就是指动画结束以后马上添加其它函数
-        $(e.currentTarget).removeClass('leave').addClass('enter')
-    })
-    $('.images > img:nth-child(3)').removeClass('enter').addClass('current')
-},6000)
-
-setTimeout(()=>{
-    $('.images > img:nth-child(3)').removeClass('current').addClass('leave').one('transitionend',(e)=>{  //transitionend就是指动画结束以后马上添加其它函数
-        $(e.currentTarget).removeClass('leave').addClass('enter')
-    })
-    $('.images > img:nth-child(1)').removeClass('enter').addClass('current')
-},9000)
-
-setTimeout(()=>{
-    $('.images > img:nth-child(1)').removeClass('current').addClass('leave').one('transitionend',(e)=>{  //transitionend就是指动画结束以后马上添加其它函数
-        $(e.currentTarget).removeClass('leave').addClass('enter')
-    })
-    $('.images > img:nth-child(2)').removeClass('enter').addClass('current')
-},12000)
-*/
